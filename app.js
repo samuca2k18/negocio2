@@ -75,6 +75,54 @@ async function deleteProduct(id) {
   });
   return response.json();
 }
+// Event listener for Update Product form submit button
+updateProductForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const id = updateProductId.value;
+  const name = updateProductName.value;
+  const price = updateProductPrice.value;
+  await updateProduct(id, name, price);
+  updateProductForm.reset();
+  await fetchProducts();
+});
+
+// Function to update a product
+async function updateProduct(id, name, price) {
+  const response = await fetch(`http://3.89.64.38:3000/products/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, price }),
+  });
+  return response.json();
+}
+
+const getProductForm = document.querySelector('#get-product-form');
+const productDetails = document.querySelector('#product-details');
+
+getProductForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const id = getProductForm.elements['get-id'].value;
+  const product = await getProductById(id);
+
+  // Display product details
+  productDetails.innerHTML = product
+    ? `<p>${product.name} - $${product.price}</p>`
+    : '<p>Product not found</p>';
+});
+
+// Function to fetch a product by ID
+async function getProductById(id) {
+  try {
+    const response = await fetch(`http://3.89.64.38:3000/products/${id}`);
+    if (!response.ok) throw new Error('Product not found');
+    return response.json();
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
 
 // Fetch all products on page load
 fetchProducts();
